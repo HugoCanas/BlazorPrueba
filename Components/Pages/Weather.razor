@@ -1,0 +1,64 @@
+﻿@page "/weather"
+@attribute [StreamRendering]
+
+<PageTitle>Weather</PageTitle>
+
+<h1>Eguraldia</h1>
+
+<p>Hau erakusten du egun hauetako data eta Eguraldia.</p>
+
+@if (forecasts == null)
+{
+    <p><em>Kargatzen...</em></p>
+}
+else
+{
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Data</th>
+                <th>Temperatura. (C)</th>
+                <th>Temperatura. (F)</th>
+                <th>Guztira</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var forecast in forecasts)
+            {
+                <tr>
+                    <td>@forecast.Data.ToShortDateString()</td>
+                    <td>@forecast.TemperaturaC</td>
+                    <td>@forecast.TemperaturaF</td>
+                    <td>@forecast.Guztira</td>
+                </tr>
+            }
+        </tbody>
+    </table>
+}
+
+@code {
+    private WeatherForecast[]? forecasts;
+
+    protected override async Task OnInitializedAsync()
+    {
+        // Simulate asynchronous loading to demonstrate streaming rendering
+        await Task.Delay(500);
+
+        var startDate = DateOnly.FromDateTime(DateTime.Now);
+        var summaries = new[] { "Izoztuta", "Arriostramendua", "Hotza", "freskoa", "Epela", "Warm", "Epela/Berotxu", "Bero", "Itogarria", "Erretzailea" };
+        forecasts = Enumerable.Range(1, 5).Select(index => new WeatherForecast
+        {
+            Data = startDate.AddDays(index),
+            TemperaturaC = Random.Shared.Next(-20, 55),
+                Guztira = summaries[Random.Shared.Next(summaries.Length)]
+        }).ToArray();
+    }
+
+    private class WeatherForecast
+    {
+        public DateOnly Data { get; set; }
+        public int TemperaturaC { get; set; }
+        public string? Guztira { get; set; }
+        public int TemperaturaF => 32 + (int)(TemperaturaC / 0.5556);
+    }
+}
